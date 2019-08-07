@@ -7,7 +7,7 @@ const server = require('http').Server(app);
 const io = require('socket.io')(server);
 
 /* CORS */
-app.use(function(req, res, next) {
+app.use(function (req, res, next) {
   res.header('Access-Control-Allow-Origin', '*');
   res.header(
     'Access-Control-Allow-Headers',
@@ -33,6 +33,18 @@ app.use(
 /* parse application/json */
 app.use(bodyParser.json());
 
+io.on('connection', function (socket) {
+  socket.emit('other', { esto: 'desde el backend' });
+  socket.on('my other event', function (data) {
+    console.log(data);
+  });
+});
+
+app.use(function (req, res, next) {
+  req.io = io;
+  next();
+});
+
 /* Importar rutas */
 let appRoutes = require('./routes/app');
 let userRoutes = require('./routes/user');
@@ -43,12 +55,7 @@ app.use('/', appRoutes);
 app.use('/usuario', userRoutes);
 // app.use('/login', loginRoutes);
 
-io.on('connection', function(socket) {
-  socket.emit('news', { hello: 'world' });
-  socket.on('my other event', function(data) {
-    console.log(data);
-  });
-});
+
 
 server.listen(process.env.PORT || 5000, () => {
   console.log(`Express server puerto ${process.env.PORT || 5000} online`);

@@ -40,15 +40,20 @@ const createUser = (request, response) => {
   const { name, email, phone, birthday, status } = request.body;
 
   pool.query(
-    'INSERT INTO users (name, email, phone, birthday, status) VALUES ($1, $2, $3, $4, $5)',
+    'INSERT INTO users (name, email, phone, birthday, status) VALUES ($1, $2, $3, $4, $5) RETURNING *',
     [name, email, phone, birthday, status],
     (error, results) => {
       if (error) {
         throw error;
       }
+      let ID = '';
+      results.rows.forEach(res => {
+        ID = res.id;
+        request.io.sockets.emit('status', { [ID]: status });
+      });
       response
         .status(201)
-        .send(`Usuario agregado con exito: ${results.rowCount}`);
+        .send(`Usuario agregado exitosamente, con ID: ${ID}`);
     }
   );
 };
