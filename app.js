@@ -1,12 +1,20 @@
+/**
+ *  Librerias iniciales
+ */
 const express = require('express');
 const bodyParser = require('body-parser');
 const path = require('path');
 
+/**
+ *  Socket inicializado 
+ */
 const app = express();
 const server = require('http').Server(app);
 const io = require('socket.io')(server);
 
-/* CORS */
+/**
+ *  CORS
+ */
 app.use(function (req, res, next) {
   res.header('Access-Control-Allow-Origin', '*');
   res.header(
@@ -17,22 +25,31 @@ app.use(function (req, res, next) {
   next();
 });
 
-/* assets */
+/**
+ *  Assets publicos
+ */
 app
   .use(express.static(path.join(__dirname, 'public')))
   .set('views', path.join(__dirname, 'views'))
   .set('view engine', 'ejs');
 
-/* parse application/x-www-form-urlencoded */
+/**
+ *  Lectura de application/x-www-form-urlencoded 
+ */
 app.use(
   bodyParser.urlencoded({
     extended: false
   })
 );
 
-/* parse application/json */
+/**
+ *  Lectura de application/json 
+ */
 app.use(bodyParser.json());
 
+/** 
+ * Primera emisión del servicio Socket.io 
+ */
 io.on('connection', function (socket) {
   socket.emit('other', { esto: 'desde el backend' });
   socket.on('my other event', function (data) {
@@ -40,23 +57,29 @@ io.on('connection', function (socket) {
   });
 });
 
+/* Envío de la conexion del Socket */
 app.use(function (req, res, next) {
   req.io = io;
   next();
 });
 
-/* Importar rutas */
+/** 
+ * Importar rutas 
+ */
 let appRoutes = require('./routes/app');
 let userRoutes = require('./routes/user');
-// let loginRoutes = require('./routes/login');
+let loginRoutes = require('./routes/login');
 
-/* Rutas */
+/** 
+ * Rutas 
+ */
 app.use('/', appRoutes);
 app.use('/usuario', userRoutes);
-// app.use('/login', loginRoutes);
+app.use('/login', loginRoutes);
 
-
-
+/**
+ * Asignación del puerto
+ */
 server.listen(process.env.PORT || 5000, () => {
   console.log(`Express server puerto ${process.env.PORT || 5000} online`);
 });

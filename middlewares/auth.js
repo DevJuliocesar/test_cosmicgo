@@ -4,11 +4,13 @@ var jwt = require('jsonwebtoken');
 
 var public_key = fs.readFileSync('./keys/public.key', 'utf8');
 
-// ================================================
-// Verificar Token
-// ================================================
+/** 
+ * ================================================
+ * Verificar Token
+ * ================================================
+ */
 
-exports.verificarToken = function(req, res, next) {
+exports.verificarToken = function (req, res, next) {
   var verifyOptions = {
     issuer: 'DevJulioCesar',
     subject: 'jcmaldonadom@ufpso.edu.co',

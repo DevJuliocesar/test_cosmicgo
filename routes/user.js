@@ -1,13 +1,7 @@
 const express = require('express');
-
-// var bcrypt = require('bcryptjs');
-
-var mdAuth = require('../middlewares/auth');
-
+const mdAuth = require('../middlewares/auth');
 const app = express();
-
 const _user = require('../models/user');
-
 const { check, validationResult } = require('express-validator');
 
 // ================================================
@@ -81,6 +75,7 @@ app.post(
       .isISO8601()
       .toDate()
   ],
+  mdAuth.verificarToken,
   (req, res) => {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
