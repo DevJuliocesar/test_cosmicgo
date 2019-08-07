@@ -4,12 +4,8 @@ const path = require('path');
 const PORT = process.env.PORT || 5000;
 
 const app = express();
-
-const { Pool } = require('pg');
-const pool = new Pool({
-  connectionString: process.env.DATABASE_URL,
-  ssl: true
-});
+const server = require('http').Server(app);
+const io = require('socket.io')(server);
 
 // CORS
 app.use(function(req, res, next) {
@@ -40,10 +36,19 @@ app.use(bodyParser.json());
 
 /* Importar rutas */
 let appRoutes = require('./routes/app');
+let userRoutes = require('./routes/user');
 
 /* Rutas */
 app.use('/', appRoutes);
+app.use('/usuario', userRoutes);
 
-app.listen(PORT, () => {
+io.on('connection', function(socket) {
+  socket.emit('news', { hello: 'world' });
+  socket.on('my other event', function(data) {
+    console.log(data);
+  });
+});
+
+server.listen(PORT, () => {
   console.log(`Express server puerto ${PORT} online`);
 });

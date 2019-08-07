@@ -1,8 +1,9 @@
 var express = require('express');
 
 const { Pool } = require('pg');
+const { DATABASE_URL } = process.env;
 const pool = new Pool({
-  connectionString: process.env.DATABASE_URL,
+  connectionString: DATABASE_URL,
   ssl: true
 });
 

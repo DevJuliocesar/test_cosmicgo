@@ -1,23 +1,50 @@
 <!DOCTYPE html>
 <html>
+
 <head>
   <% include ../partials/header.ejs %>
 </head>
 
 <body>
 
-<% include ../partials/nav.ejs %>
+  <div class="container">
+    <h2>Database Results</h2>
 
-<div class="container">
-<h2>Database Results</h2>
+    <table>
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>Nombre</th>
+          <th>Correo</th>
+          <th>Telefono</th>
+          <th>Cumpleaños</th>
+          <th>Estado</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% results.forEach(function(user){ %>
+        <tr>
+          <td><%- user.id %></td>
+          <td><%- user.name %></td>
+          <td><%- user.email %></td>
+          <td><%- user.phone %></td>
+          <td><%- user.birthday %></td>
+          <td><%- user.status %></td>
+        </tr>
+        <% }); %>
+      </tbody>
+    </table>
 
-<ul>
-    <% results.forEach(function(r) { %>
-        <li><%= r.id %> - <%= r.name %></li>
-    <% }); %>
-</ul>
-
-</div>
+  </div>
 
 </body>
+<script src="/socket.io/socket.io.js"></script>
+<script>
+  var socket = io.connect('http://localhost:5000');
+  socket.on('news', function (data) {
+    console.log(data);
+    socket.emit('my other event', { my: 'data' });
+  });
+</script>
+
 </html>
