@@ -1,36 +1,35 @@
-var express = require('express');
+const express = require('express');
 
 // var bcrypt = require('bcryptjs');
 
-// var mdAuth = require('../middlewares/auth');
+var mdAuth = require('../middlewares/auth');
 
-var app = express();
+const app = express();
 
-const { Pool } = require('pg');
-const pool = new Pool({
-  connectionString: process.env.DATABASE_URL,
-  ssl: true
-});
+const _user = require('../models/user');
 
-// var Usuario = require('../models/user');
+const { check, validationResult } = require('express-validator');
 
 // ================================================
 // Obtener todos los usuarios
 // ================================================
 
-app.get('/', async (req, res, next) => {
-  //   var skip = Number(req.query.skip) || 0;
-
+app.get('/', (req, res, next) => {
   try {
-    const client = await pool.connect();
-    const result = await client.query('SELECT * FROM users');
-    const results = result ? result.rows : null;
-    res.status(200).json({
-      ok: true,
-      usuarios: results,
-      total: Object.keys(results).length
-    });
-    client.release();
+    _user.getUsers(req, res);
+  } catch (err) {
+    console.error(err);
+    res.send('Error ' + err);
+  }
+});
+
+// ================================================
+// Obtener un usuario
+// ================================================
+
+app.get('/', (req, res, next) => {
+  try {
+    _user.getUserById(req, res);
   } catch (err) {
     console.error(err);
     res.send('Error ' + err);
@@ -41,25 +40,73 @@ app.get('/', async (req, res, next) => {
 // Actualizar usuario
 // ================================================
 
-// app.put('/:id', mdAuth.verificarToken, (req, res) => {
-//   var id = req.params.id;
-//   var body = req.body;
-// });
+app.put(
+  '/:id',
+  [
+    check('email').isEmail(),
+    check('name').isLength({ max: 50 }),
+    check('phone').isLength({ min: 7 }),
+    check('status').isBoolean(),
+    check('birthday')
+      .isISO8601()
+      .toDate()
+  ],
+  (req, res) => {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(422).json({ errors: errors.array() });
+    }
+
+    try {
+      _user.updateUser(req, res);
+    } catch (err) {
+      console.error(err);
+      res.send('Error ' + err);
+    }
+  }
+);
 
 // ================================================
 // Crear un nuevo usuario
 // ================================================
 
-// app.post('/', (req, res) => {
-//   const body = req.body;
-// });
+app.post(
+  '/',
+  [
+    check('email').isEmail(),
+    check('name').isLength({ max: 50 }),
+    check('phone').isLength({ min: 7 }),
+    check('status').isBoolean(),
+    check('birthday')
+      .isISO8601()
+      .toDate()
+  ],
+  (req, res) => {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(422).json({ errors: errors.array() });
+    }
+
+    try {
+      _user.createUser(req, res);
+    } catch (err) {
+      console.error(err);
+      res.send('Error ' + err);
+    }
+  }
+);
 
 // ================================================
 // Borrar un usuario
 // ================================================
 
-// app.delete('/:id', mdAuth.verificarToken, (req, res) => {
-//   var id = req.params.id;
-// });
+app.delete('/:id', (req, res) => {
+  try {
+    _user.deleteUser(req, res);
+  } catch (err) {
+    console.error(err);
+    res.send('Error ' + err);
+  }
+});
 
 module.exports = app;

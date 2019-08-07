@@ -1,13 +1,12 @@
 const express = require('express');
 const bodyParser = require('body-parser');
 const path = require('path');
-const PORT = process.env.PORT || 5000;
 
 const app = express();
 const server = require('http').Server(app);
 const io = require('socket.io')(server);
 
-// CORS
+/* CORS */
 app.use(function(req, res, next) {
   res.header('Access-Control-Allow-Origin', '*');
   res.header(
@@ -37,10 +36,12 @@ app.use(bodyParser.json());
 /* Importar rutas */
 let appRoutes = require('./routes/app');
 let userRoutes = require('./routes/user');
+// let loginRoutes = require('./routes/login');
 
 /* Rutas */
 app.use('/', appRoutes);
 app.use('/usuario', userRoutes);
+// app.use('/login', loginRoutes);
 
 io.on('connection', function(socket) {
   socket.emit('news', { hello: 'world' });
@@ -49,6 +50,6 @@ io.on('connection', function(socket) {
   });
 });
 
-server.listen(PORT, () => {
-  console.log(`Express server puerto ${PORT} online`);
+server.listen(process.env.PORT || 5000, () => {
+  console.log(`Express server puerto ${process.env.PORT || 5000} online`);
 });
