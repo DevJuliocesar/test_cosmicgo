@@ -90,7 +90,11 @@ const deleteUser = (request, response) => {
     if (error) {
       throw error;
     }
-    response.status(200).send(`Usuario eliminado con el ID: ${id}`);
+    if (results.rowCount > 0) {
+      response.status(200).send(`Usuario eliminado con el ID: ${id}`);
+    } else {
+      response.status(200).send(`Usuario con el ID: ${id}, no existe`);
+    }
   });
 };
 
