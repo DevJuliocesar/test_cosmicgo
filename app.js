@@ -1,8 +1,7 @@
-var express = require('express');
-var mongoose = require('mongoose');
-var bodyParser = require('body-parser');
-
-var app = express();
+const express = require('express');
+const bodyParser = require('body-parser');
+const PORT = process.env.PORT || 5000;
+const app = express();
 
 // CORS
 app.use(function(req, res, next) {
@@ -31,6 +30,6 @@ let appRoutes = require('./routes/app');
 /* Rutas */
 app.use('/', appRoutes);
 
-app.listen(5000, () => {
+app.listen(PORT, () => {
   console.log('Express server puerto 5000 online');
 });
